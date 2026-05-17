@@ -1,0 +1,170 @@
+const fs = require('fs');
+const path = 'C:/Users/LEO/.qclaw/workspace/china-franchise-net/prisma/schema.prisma';
+
+const content = `generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Brand {
+  id              String    @id @default(cuid())
+  name            String
+  slug            String    @unique
+  logo            String?
+  banner          String?
+  categorySlug    String
+  industry        String
+  franchiseFee    String
+  totalCost       String
+  storesChina     Int       @default(0)
+  storesOverseas  Int       @default(0)
+  advantage       String?
+  description     String
+  process         String    @default("[]")
+  support         String    @default("[]")
+  images          String    @default("[]")
+  status          String    @default("pending")
+  scrapedFrom     String?
+  scrapedAt       DateTime?
+  publishedAt     DateTime?
+  viewCount       Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  highlights      String?
+  brandFeatures   String?
+  brandStory      String?
+  contractYears   Int?
+  cooperationMode String?
+  deliveryArea    String?
+  videoUrl        String?
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  icon      String?
+  desc      String?
+  sort      Int      @default(0)
+  color     String   @default("#1a56db")
+  createdAt DateTime @default(now())
+}
+
+model Inquiry {
+  id        String   @id @default(cuid())
+  brandId   String?
+  name      String
+  phone     String
+  email     String?
+  message   String?
+  status    String   @default("new")
+  createdAt DateTime @default(now())
+}
+
+model ScrapeLog {
+  id          String   @id @default(cuid())
+  brandsCount Int      @default(0)
+  status      String
+  message     String?
+  details     String?
+  createdAt   DateTime @default(now())
+}
+
+model CmsPage {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String
+  locale      String   @default("zh")
+  status      String   @default("draft")
+  featuredImg String?
+  seoTitle    String?
+  seoDesc     String?
+  sortOrder   Int      @default(0)
+  showInNav   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  nickname  String?
+  createdAt DateTime @default(now())
+}
+
+model Settings {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model Article {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  content     String
+  excerpt     String?
+  category    String
+  locale      String    @default("zh")
+  status      String    @default("draft")
+  featuredImg String?
+  author      String?
+  viewCount   Int       @default(0)
+  publishedAt DateTime?
+  seoTitle    String?
+  seoDesc     String?
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model OverseasService {
+  id             String   @id @default(cuid())
+  serviceId      String   @unique
+  name           String
+  nameEn         String?
+  nameTh         String?
+  nameVi         String?
+  icon           String?
+  gallery        String?  @default("[]")
+  description    String?
+  descriptionEn  String?
+  descriptionTh  String?
+  descriptionVi  String?
+  content        String?
+  contentEn      String?
+  contentTh      String?
+  contentVi      String?
+  advantages     String?  @default("[]")
+  advantagesEn   String?  @default("[]")
+  advantagesTh   String?  @default("[]")
+  advantagesVi   String?  @default("[]")
+  sortOrder      Int      @default(0)
+  status         String   @default("active")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Faq {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  category  String   @default("overseas")
+  locale    String   @default("zh")
+  status    String   @default("draft")
+  sortOrder Int      @default(0)
+  viewCount Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+`;
+
+fs.writeFileSync(path, content, 'utf8');
+console.log('Schema written successfully');
