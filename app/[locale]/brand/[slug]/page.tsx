@@ -18,11 +18,13 @@ export async function generateMetadata({ params }: { params: { locale: string; s
   
   const locale = (params.locale || 'zh') as Locale;
   const i18n = translations[locale];
+  const bt = (i18n as any).brandTranslations?.[params.slug];
+  const brandName = bt?.name || brand.name;
   const category = await prisma.category.findUnique({ where: { slug: brand.categorySlug } });
   const categoryName = category?.name || brand.industry;
   
-  const title = `${brand.name}${categoryName ? ` - ${categoryName}` : ''} ${i18n.brand.franchiseFeeLabel || ''} ${brand.franchiseFee}`;
-  const description = `${brand.name}: ${brand.description?.slice(0, 160) || `${i18n.brand.franchiseFee}${brand.franchiseFee}，${i18n.brand.storesChinaLabel || ''}${brand.storesChina}${i18n.brand.storesUnit || ''}`}`;
+  const title = `${brandName}${categoryName ? ` - ${categoryName}` : ''} ${i18n.brand.franchiseFeeLabel || ''} ${brand.franchiseFee}`;
+  const description = `${brandName}: ${brand.description?.slice(0, 160) || `${i18n.brand.franchiseFee}${brand.franchiseFee}，${i18n.brand.storesChinaLabel || ''}${brand.storesChina}${i18n.brand.storesUnit || ''}`}`;
   const ogImage = brand.banner || brand.logo || `${baseUrl}/og-image.jpg`;
   
   return {
@@ -33,7 +35,7 @@ export async function generateMetadata({ params }: { params: { locale: string; s
       description,
       url: `${baseUrl}/${locale}/brand/${brand.slug}`,
       siteName: 'cnfranchise.com',
-      images: [{ url: ogImage, width: 1200, height: 630, alt: brand.name }],
+      images: [{ url: ogImage, width: 1200, height: 630, alt: brandName }],
       locale: locale === 'zh' ? 'zh_CN' : locale === 'en' ? 'en_US' : locale === 'th' ? 'th_TH' : 'vi_VN',
       type: 'website',
     },
@@ -56,11 +58,11 @@ export async function generateMetadata({ params }: { params: { locale: string; s
 }
 
 // Generate structured data for brand page
-function generateBrandJsonLd(brand: any, locale: string) {
+function generateBrandJsonLd(brand: any, locale: string, brandName: string, categoryName: string) {
   return {
     '@context': 'https://schema.org',
     '@type': ['Organization', 'LocalBusiness'],
-    name: brand.name,
+    name: brandName,
     description: brand.description || '',
     url: `${baseUrl}/${locale}/brand/${brand.slug}`,
     logo: brand.logo || '',
@@ -116,6 +118,10 @@ export default async function BrandPage({ params }: { params: { locale: string; 
   // i18n
   const i18n = translations[locale];
   const b = i18n.brand;
+  const bt = (i18n as any).brandTranslations?.[brand.slug];
+  const brandName = bt?.name || brand.name;
+  const brandDesc = bt?.description || brand.description;
+  const brandIndustry = bt?.industry || categoryName;
 
   // 品牌资料图片
   let brandImages: string[] = [];
@@ -131,7 +137,7 @@ export default async function BrandPage({ params }: { params: { locale: string; 
   });
 
   // JSON-LD structured data
-  const jsonLd = generateBrandJsonLd(brand, locale);
+  const jsonLd = generateBrandJsonLd(brand, locale, brandName, categoryName);
 
   return (
     <div className="page-enter">
@@ -146,7 +152,7 @@ export default async function BrandPage({ params }: { params: { locale: string; 
           itemListElement: [
             { '@type': 'ListItem', position: 1, name: b.home, item: `${baseUrl}/${locale}/` },
             { '@type': 'ListItem', position: 2, name: categoryName, item: `${baseUrl}/${locale}/category/${brand.categorySlug}` },
-            { '@type': 'ListItem', position: 3, name: brand.name, item: `${baseUrl}/${locale}/brand/${brand.slug}` },
+            { '@type': 'ListItem', position: 3, name: brandName, item: `${baseUrl}/${locale}/brand/${brand.slug}` },
           ],
         }),
       }} />
@@ -159,7 +165,7 @@ export default async function BrandPage({ params }: { params: { locale: string; 
             <span>/</span>
             <Link href={`/${locale}/category/${brand.categorySlug}`} className="hover:text-primary">{categoryName}</Link>
             <span>/</span>
-            <span className="text-slate-800 font-medium">{brand.name}</span>
+            <span className="text-slate-800 font-medium">{brandName}</span>
           </nav>
         </div>
       </div>
@@ -172,9 +178,9 @@ export default async function BrandPage({ params }: { params: { locale: string; 
             <div className="w-full md:w-72 shrink-0">
               <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
                 {brand.banner ? (
-                  <img src={brand.banner} alt={`${brand.name} ${categoryName} brand banner`} className="w-full aspect-square object-cover" />
+                  <img src={brand.banner} alt={`${brandName} ${brandIndustry} brand banner`} className="w-full aspect-square object-cover" />
                 ) : brand.logo ? (
-                  <img src={brand.logo} alt={`${brand.name} logo`} className="w-full aspect-square object-contain p-8 bg-slate-50" />
+                  <img src={brand.logo} alt={`${brandName} logo`} className="w-full aspect-square object-contain p-8 bg-slate-50" />
                 ) : (
                   <div className="w-full aspect-square bg-slate-50 flex items-center justify-center text-6xl">
                     {category?.icon || b.categoryIcon}
@@ -186,8 +192,8 @@ export default async function BrandPage({ params }: { params: { locale: string; 
             {/* 右侧 - 品牌信息 */}
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-4">
-                <h1 className="text-2xl md:text-3xl font-bold text-slate-800">{brand.name}</h1>
-                <span className={`tag-pill ${category ? '' : tagClass}`} style={category ? tagStyle : {}}>{categoryName}</span>
+                <h1 className="text-2xl md:text-3xl font-bold text-slate-800">{brandName}</h1>
+                <span className={`tag-pill ${category ? '' : tagClass}`} style={category ? tagStyle : {}}>{brandIndustry}</span>
               </div>
 
               {/* 4个数据卡 */}
@@ -196,7 +202,7 @@ export default async function BrandPage({ params }: { params: { locale: string; 
                   { l: b.franchiseFee, v: brand.franchiseFee, c: 'text-blue-600' },
                   { l: b.storesChina, v: brand.storesChina > 0 ? `${brand.storesChina.toLocaleString()}${b.storesUnit}` : '-', c: 'text-blue-600 font-bold' },
                   { l: b.storesOverseas, v: brand.storesOverseas > 0 ? `${brand.storesOverseas.toLocaleString()}${b.storesUnit}` : '-', c: 'text-emerald-600 font-bold' },
-                  { l: b.industry, v: categoryName, c: 'text-slate-800' },
+                  { l: b.industry, v: brandIndustry, c: 'text-slate-800' },
                 ].map(item => (
                   <div key={item.l} className="bg-slate-50 rounded-xl p-3.5 text-center">
                     <div className="text-xs text-slate-400 mb-1">{item.l}</div>
@@ -205,10 +211,10 @@ export default async function BrandPage({ params }: { params: { locale: string; 
                 ))}
               </div>
 
-              <p className="text-slate-600 leading-relaxed mb-5">{brand.description}</p>
+              <p className="text-slate-600 leading-relaxed mb-5">{brandDesc}</p>
 
               <div className="flex flex-wrap gap-3">
-                <BrandCTA brandName={brand.name} locale={locale} />
+                <BrandCTA brandName={brandName} locale={locale} />
                 <Link href={`/${locale}/category/${brand.categorySlug}`} className="px-6 py-2.5 border border-slate-200 text-slate-600 rounded-xl font-medium hover:bg-slate-50 transition-all inline-flex items-center">{b.backToList}</Link>
               </div>
             </div>
@@ -231,7 +237,7 @@ export default async function BrandPage({ params }: { params: { locale: string; 
                     <div className="rounded-xl overflow-hidden aspect-video max-w-2xl border border-slate-100">
                       <iframe
                         src={brand.videoUrl.includes('youtube') ? brand.videoUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'www.youtube.com/embed/') : brand.videoUrl}
-                        className="w-full h-full" allowFullScreen title={`${brand.name} brand video`} loading="lazy"
+                        className="w-full h-full" allowFullScreen title={`${brandName} brand video`} loading="lazy"
                       />
                     </div>
                   </div>
@@ -248,7 +254,7 @@ export default async function BrandPage({ params }: { params: { locale: string; 
                     <div className="grid grid-cols-3 gap-3">
                       {brandImages.map((img, i) => (
                         <a key={i} href={img} target="_blank" rel="noopener noreferrer" className="aspect-video rounded-lg overflow-hidden bg-slate-100 hover:opacity-80 transition-opacity">
-                          <img src={img} alt={`${brand.name} photo ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                          <img src={img} alt={`${brandName} photo ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
                         </a>
                       ))}
                     </div>
@@ -288,7 +294,7 @@ export default async function BrandPage({ params }: { params: { locale: string; 
             <BrandGallery brand={brand} />
           </div>
           <div className="space-y-6">
-            <div id="inquiry"><InquiryForm brandId={brand.id} brandName={brand.name} locale={locale} /></div>
+            <div id="inquiry"><InquiryForm brandId={brand.id} brandName={brandName} locale={locale} /></div>
             <div className="bg-white rounded-2xl border border-slate-100 p-5">
               <h3 className="font-bold text-slate-800 mb-4">{b.basicInfo}</h3>
               <div className="space-y-3">
