@@ -44,7 +44,7 @@ export default async function QaPage({ params }: { params: { locale: string } })
 
       {/* FAQ List */}
       <section className="py-16 bg-white">
-        <div className="max-w-3xl mx-auto px-4">
+        <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-xl font-bold mb-8">
             {locale === 'zh' ? '常见问题' : locale === 'en' ? 'Common Questions' : 'Câu hỏi phổ biến'}
           </h2>
