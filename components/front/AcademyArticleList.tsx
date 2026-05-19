@@ -109,7 +109,7 @@ export default function AcademyArticleList({
           articles.map((article) => (
             <Link
               key={article.slug}
-              href={`/${locale}/academy/article/${article.slug}`}
+              href={`/${locale}/academy/${category}/${article.slug}`}
               className="flex items-start gap-4 bg-slate-50 rounded-2xl p-4 hover:bg-white hover:shadow-md transition-all group"
             >
               {/* Cover Image */}
