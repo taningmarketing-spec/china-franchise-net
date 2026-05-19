@@ -130,6 +130,11 @@ export default async function BrandPage({ params }: { params: { locale: string; 
   let support: string[] = [];
   try { processSteps = JSON.parse(brand.process || '[]'); } catch {}
   try { support = JSON.parse(brand.support || '[]'); } catch {}
+  // i18n overrides for en
+  if (locale !== 'zh' && bt) {
+    if (bt.process) processSteps = bt.process;
+    if (bt.support) support = bt.support;
+  }
 
   const relatedBrands = await prisma.brand.findMany({
     where: { status: 'published', categorySlug: brand.categorySlug, NOT: { id: brand.id } },
@@ -199,7 +204,7 @@ export default async function BrandPage({ params }: { params: { locale: string; 
               {/* 4个数据卡 */}
               <div className="grid grid-cols-4 gap-3 mb-5">
                 {[
-                  { l: b.franchiseFee, v: brand.franchiseFee, c: 'text-blue-600' },
+                  { l: b.franchiseFee, v: bt?.franchiseFee || brand.franchiseFee, c: 'text-blue-600' },
                   { l: b.storesChina, v: brand.storesChina > 0 ? `${brand.storesChina.toLocaleString()}${b.storesUnit}` : '-', c: 'text-blue-600 font-bold' },
                   { l: b.storesOverseas, v: brand.storesOverseas > 0 ? `${brand.storesOverseas.toLocaleString()}${b.storesUnit}` : '-', c: 'text-emerald-600 font-bold' },
                   { l: b.industry, v: brandIndustry, c: 'text-slate-800' },
@@ -314,7 +319,7 @@ export default async function BrandPage({ params }: { params: { locale: string; 
               {relatedBrands.map(rb => (
                 <Link key={rb.id} href={`/${locale}/brand/${rb.slug}`} className="brand-card bg-white rounded-xl border border-slate-100 overflow-hidden p-3">
                   <div className="h-20 bg-slate-50 rounded-lg mb-2 flex items-center justify-center text-3xl">{b.categoryIcon}</div>
-                  <div className="font-semibold text-sm text-slate-800 mb-1 truncate">{rb.name}</div>
+                  <div className="font-semibold text-sm text-slate-800 mb-1 truncate">{(i18n as any).brandTranslations?.[rb.slug]?.name || rb.name}</div>
                   <div className="text-xs text-slate-400">{rb.franchiseFee}{b.feeSuffix}</div>
                 </Link>
               ))}

@@ -57,7 +57,7 @@ export default function BrandCard({ brand, locale = 'zh' }: BrandCardProps) {
         {brand.advantage && (
           <div className="absolute bottom-3 left-3 right-3">
             <span className="inline-block bg-orange-500/90 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded shadow-sm truncate max-w-full">
-              {brand.advantage}
+              {bt?.advantage || brand.advantage}
             </span>
           </div>
         )}
