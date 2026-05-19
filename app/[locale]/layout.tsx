@@ -65,8 +65,6 @@ export async function generateMetadata({ params }: { params: { locale: string } 
       languages: {
         'zh-CN': `${baseUrl}/zh`,
         'en-US': `${baseUrl}/en`,
-        'th-TH': `${baseUrl}/th`,
-        'vi-VN': `${baseUrl}/vi`,
       },
     },
     robots: {
@@ -95,70 +93,12 @@ export default function LocaleLayout({ children, params }: Props) {
   }
 
   const t = translations[locale] || translations.zh;
-  const nav = t.nav;
-  const footer = t.footer;
-  const home = t.home;
-
-  // Category items from translations
-  const categoryItems: [string, string][] = [
-    [nav.tea || '茶饮', 'chayin'],
-    [nav.coffee || '咖啡', 'kafei'],
-    [nav.snack || '小吃', 'xiaochi'],
-    [nav.dessert || '甜品', 'tianpin'],
-    [nav.tangshui || '糖水', 'tangshui'],
-    [nav.food || '餐饮', 'catering'],
-  ];
-  // Budget items from translations
-  const budgetItems: [string, string][] = [
-    [footer.fiveK || '5万以下', '?maxCost=5'],
-    [footer.tenK || '10万以下', '?maxCost=10'],
-    [footer.twentyK || '20万以下', '?maxCost=20'],
-    [footer.fiftyK || '50万以下', '?maxCost=50'],
-  ];
 
   return (
     <LocaleClientLayout locale={locale}>
       {children}
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-slate-400 text-sm">
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-            <div className="col-span-2 md:col-span-1">
-              <div className="text-white font-bold text-lg mb-3">{footer.tagline}</div>
-              <p className="text-slate-500 text-xs leading-relaxed">{footer.slogan}</p>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-3">{footer.hotIndustries}</h4>
-              <ul className="space-y-2 text-xs">
-                {categoryItems.map(([name, slug]) => (
-                  <li key={slug}><Link href={`/${locale}/category/${slug}`} className="hover:text-white transition-colors">{name}</Link></li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-3">{footer.budget}</h4>
-              <ul className="space-y-2 text-xs">
-                {budgetItems.map(([label, qs]) => (
-                  <li key={qs}><Link href={`/${locale}/brands${qs}`} className="hover:text-white transition-colors">{label}</Link></li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-3">{footer.aboutUs}</h4>
-              <ul className="space-y-2 text-xs">
-                <li><Link href={`/${locale}/about`} className="hover:text-white transition-colors">{footer.aboutUs}</Link></li>
-                <li><Link href={`/${locale}/privacy`} className="hover:text-white transition-colors">{footer.privacy}</Link></li>
-                <li><Link href={`/${locale}/terms`} className="hover:text-white transition-colors">{footer.terms}</Link></li>
-                <li><Link href={`/${locale}/contact`} className="hover:text-white transition-colors">{footer.contact}</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-slate-800 pt-6 text-center text-xs text-slate-600">
-            <p>{footer.copyright}</p>
-          </div>
-        </div>
-      </footer>
+      {/* Footer is in LocaleClientLayout - do not duplicate */}
 
       {/* Global JSON-LD: Organization + WebSite + SearchAction */}
       <script
