@@ -21,10 +21,13 @@ export async function generateMetadata({ params }: { params: { locale: string; s
   const bt = (i18n as any).brandTranslations?.[params.slug];
   const brandName = bt?.name || brand.name;
   const category = await prisma.category.findUnique({ where: { slug: brand.categorySlug } });
-  const categoryName = category?.name || brand.industry;
+  const btMeta = (i18n as any).brandTranslations?.[params.slug];
+  const categoryName = btMeta?.industry || category?.name || brand.industry;
+  const franchiseFeeDisplay = btMeta?.franchiseFee || brand.franchiseFee;
   
-  const title = `${brandName}${categoryName ? ` - ${categoryName}` : ''} ${i18n.brand.franchiseFeeLabel || ''} ${brand.franchiseFee}`;
-  const description = `${brandName}: ${brand.description?.slice(0, 160) || `${i18n.brand.franchiseFee}${brand.franchiseFee}，${i18n.brand.storesChinaLabel || ''}${brand.storesChina}${i18n.brand.storesUnit || ''}`}`;
+  const title = `${brandName}${categoryName ? ` - ${categoryName}` : ''} ${i18n.brand.franchiseFeeLabel || ''} ${franchiseFeeDisplay}`;
+  const desc = btMeta?.description || brand.description?.slice(0, 160) || '';
+  const description = desc || `${brandName}: ${franchiseFeeDisplay}`;
   const ogImage = brand.banner || brand.logo || `${baseUrl}/og-image.jpg`;
   
   return {
@@ -50,8 +53,6 @@ export async function generateMetadata({ params }: { params: { locale: string; s
       languages: {
         'zh-CN': `${baseUrl}/zh/brand/${brand.slug}`,
         'en-US': `${baseUrl}/en/brand/${brand.slug}`,
-        'th-TH': `${baseUrl}/th/brand/${brand.slug}`,
-        'vi-VN': `${baseUrl}/vi/brand/${brand.slug}`,
       },
     },
   };
