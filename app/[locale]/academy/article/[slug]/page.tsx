@@ -51,7 +51,7 @@ export default async function AcademyArticlePage({ params }: { params: { locale:
     <div className="min-h-screen bg-slate-50">
       {/* Article Header */}
       <section className="bg-white border-b">
-        <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex items-center gap-2 text-sm text-slate-500 mb-4">
             <Link href={`/${locale}/academy`} className="hover:text-primary">海外加盟学院</Link>
             <span>/</span>
@@ -76,14 +76,14 @@ export default async function AcademyArticlePage({ params }: { params: { locale:
 
       {/* Featured Image */}
       {article.featuredImg && (
-        <section className="max-w-4xl mx-auto px-4 py-4">
+        <section className="max-w-6xl mx-auto px-4 py-4">
           <img src={article.featuredImg} alt={article.title} className="w-full rounded-xl" />
         </section>
       )}
 
       {/* Article Content */}
       <section className="py-8">
-        <div className="max-w-4xl mx-auto px-4">
+        <div className="max-w-6xl mx-auto px-4">
           <article
             className="bg-white rounded-2xl p-6 md:p-10 prose prose-slate max-w-none"
             dangerouslySetInnerHTML={{ __html: article.content }}
